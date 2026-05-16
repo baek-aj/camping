@@ -275,6 +275,51 @@
     border-radius:2px; transition:width .3s;
   }
 
+  /* ── CHECKLIST EDITABLE ── */
+  .check-item-input {
+    flex:1; font-size:13px; color:var(--text-dark);
+    border:none; background:transparent; outline:none;
+    min-width:0; font-family:'Noto Sans KR',sans-serif;
+  }
+  .check-item-input.done { color:var(--text-soft); text-decoration:line-through; }
+  .check-assignee {
+    width:56px; font-size:11px; color:var(--sky);
+    border:none; border-bottom:1px dashed #ccc;
+    background:transparent; outline:none;
+    text-align:center; padding:2px 2px;
+    font-family:'Noto Sans KR',sans-serif; flex-shrink:0;
+  }
+  .check-assignee:focus { border-bottom-color:var(--sky); }
+  .check-assignee::placeholder { color:#ccc; }
+  .check-delete {
+    width:22px; height:22px; border-radius:50%;
+    border:none; background:#f0f0f0; color:#aaa;
+    font-size:12px; cursor:pointer; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    transition:background .15s, color .15s;
+    font-family:sans-serif;
+  }
+  .check-delete:active { background:#ffd5d5; color:#c00; }
+  .check-add-btn {
+    width:100%; padding:9px;
+    background:none; border:1.5px dashed #d0d0d0;
+    border-radius:10px; color:var(--text-soft);
+    font-size:12px; cursor:pointer; margin-bottom:10px;
+    font-family:'Noto Sans KR',sans-serif;
+    transition:border-color .15s, color .15s;
+  }
+  .check-add-btn:active { border-color:var(--sky); color:var(--sky); }
+  .toast {
+    position:fixed; bottom:28px; left:50%;
+    transform:translateX(-50%) translateY(12px);
+    background:rgba(20,20,20,0.82); color:#fff;
+    font-size:12px; padding:8px 20px; border-radius:20px;
+    opacity:0; transition:opacity .25s, transform .25s;
+    pointer-events:none; z-index:999;
+    font-family:'Noto Sans KR',sans-serif;
+  }
+  .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+
   /* ── ROLES ── */
   .role-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
   .role-card {
@@ -352,7 +397,7 @@
     <div class="mt mt2"></div>
     <div class="mt mt3"></div>
   </div>
-  <div class="hero-tag">MAYMAY OUTING 2025</div>
+  <div class="hero-tag">MAYMAY OUTING 2026</div>
   <div class="hero-title">메이메이<br>소풍 일정</div>
   <div class="hero-sub">서울 상암동 월드컵공원 · 4쌍 부부 8인</div>
 </div>
@@ -426,9 +471,7 @@
 <!-- TAB NAV -->
 <div class="tab-nav" id="tabNav">
   <button class="tab-btn active" onclick="switchTab('schedule', this)">📋 일정</button>
-  <button class="tab-btn" onclick="switchTab('menu', this)">🍖 메뉴</button>
   <button class="tab-btn" onclick="switchTab('checklist', this)">✅ 준비물</button>
-  <button class="tab-btn" onclick="switchTab('roles', this)">👥 역할</button>
   <button class="tab-btn" onclick="switchTab('notice', this)">📌 안내</button>
 </div>
 
@@ -591,54 +634,12 @@
   </div>
 </div>
 
-<!-- ── TAB: MENU ── -->
-<div id="tab-menu" class="tab-pane">
-  <div class="section">
-    <div class="sec-title">저녁 메뉴 계획</div>
-    <div class="menu-grid">
-      <div class="menu-card">
-        <div class="menu-tag tag-bbq">🔥 BBQ 메인</div>
-        <div class="menu-items">삼겹살 · 목살<br>소고기 채끝·꽃등심<br>닭날개 양념구이<br>소시지 · 옥수수</div>
-      </div>
-      <div class="menu-card">
-        <div class="menu-tag tag-side">🥗 사이드 & 찬</div>
-        <div class="menu-items">쌈채소 상추·깻잎<br>쌈장 · 된장찌개<br>김치 · 파절이<br>버섯 · 두부구이</div>
-      </div>
-      <div class="menu-card">
-        <div class="menu-tag tag-drink">🍻 음료</div>
-        <div class="menu-items">맥주 (캔 충분히)<br>막걸리 · 소주<br>물 · 탄산수<br>커피 · 차</div>
-      </div>
-      <div class="menu-card">
-        <div class="menu-tag tag-snack">🍡 간식 & 후식</div>
-        <div class="menu-items">과일 (수박·참외)<br>떡 · 약과<br>인스턴트 라면<br>커피 · 차</div>
-      </div>
-    </div>
-    <div class="spacer"></div>
-  </div>
-</div>
-
 <!-- ── TAB: CHECKLIST ── -->
 <div id="tab-checklist" class="tab-pane">
   <div class="section">
     <div class="sec-title">준비물 체크리스트</div>
     <div class="check-progress"><div class="check-progress-bar" id="progressBar" style="width:0%"></div></div>
     <div id="checklistContainer"></div>
-    <div class="spacer"></div>
-  </div>
-</div>
-
-<!-- ── TAB: ROLES ── -->
-<div id="tab-roles" class="tab-pane">
-  <div class="section">
-    <div class="sec-title">역할 분담 (안)</div>
-    <div class="role-grid">
-      <div class="role-card"><div class="role-icon">🛒</div><div class="role-name">장보기 총괄</div><div class="role-who">1쌍 담당</div></div>
-      <div class="role-card"><div class="role-icon">🔥</div><div class="role-name">불 피우기·그릴</div><div class="role-who">1쌍 담당</div></div>
-      <div class="role-card"><div class="role-icon">🥗</div><div class="role-name">반찬·찌개</div><div class="role-who">1쌍 담당</div></div>
-      <div class="role-card"><div class="role-icon">📸</div><div class="role-name">사진·기록</div><div class="role-who">1쌍 담당</div></div>
-      <div class="role-card"><div class="role-icon">🚗</div><div class="role-name">짐 운반 조율</div><div class="role-who">협력</div></div>
-      <div class="role-card"><div class="role-icon">🧹</div><div class="role-name">뒷정리</div><div class="role-who">전원</div></div>
-    </div>
     <div class="spacer"></div>
   </div>
 </div>
@@ -692,75 +693,122 @@ function switchTab(id, btn) {
   btn.scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'});
 }
 
-// Checklist data
-const checkData = [
+// Toast
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg || '저장됨 ✓';
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+// Default checklist data
+const defaultCats = [
   { cat:'⛺ 캠핑 장비', color:'#1A4A6B', items:[
-    {t:'텐트 / 그늘막 타프', n:''},
-    {t:'테이블 · 의자', n:'A구역 기본제공'},
-    {t:'화덕용 숯 · 착화제 · 라이터', n:'A구역 화덕 완비'},
-    {t:'그릴망 · 집게 · 바베큐 장갑', n:''},
-    {t:'랜턴 / LED 조명', n:'전기 사용 가능'},
-    {t:'돗자리 · 방석', n:''},
-    {t:'아이스박스 · 아이스팩', n:'식재료 보관'},
+    {t:'텐트 / 그늘막 타프'},{t:'테이블 · 의자'},{t:'화덕용 숯 · 착화제 · 라이터'},
+    {t:'그릴망 · 집게 · 바베큐 장갑'},{t:'랜턴 / LED 조명'},{t:'돗자리 · 방석'},{t:'아이스박스 · 아이스팩'},
   ]},
   { cat:'🍽️ 주방 용품', color:'#E8803A', items:[
-    {t:'접시 · 컵 · 수저 세트', n:'8인분'},
-    {t:'냄비 (찌개용)', n:''},
-    {t:'알루미늄 포일', n:''},
-    {t:'키친타월 · 위생장갑 · 앞치마', n:''},
-    {t:'식용유 · 소금 · 후추 · 버터', n:'기본 양념'},
-    {t:'물티슈 · 쓰레기봉투 (대형)', n:''},
-    {t:'세제 · 수세미', n:'뒷정리용'},
+    {t:'접시 · 컵 · 수저 세트'},{t:'냄비 (찌개용)'},{t:'알루미늄 포일'},
+    {t:'키친타월 · 위생장갑 · 앞치마'},{t:'식용유 · 소금 · 후추 · 버터'},
+    {t:'물티슈 · 쓰레기봉투 (대형)'},{t:'세제 · 수세미'},
   ]},
   { cat:'🥩 식재료', color:'#C45A1A', items:[
-    {t:'삼겹살 · 목살', n:'1인 300~400g'},
-    {t:'소고기 (채끝·꽃등심)', n:'1인 150~200g'},
-    {t:'닭날개 (양념구이)', n:''},
-    {t:'소시지 · 옥수수', n:'사이드'},
-    {t:'쌈채소 (상추·깻잎·쑥갓)', n:''},
-    {t:'쌈장 · 파절이 · 김치', n:''},
-    {t:'버섯 · 두부', n:'구이용'},
-    {t:'된장찌개 재료', n:'두부·애호박·버섯'},
-    {t:'과일 (수박·참외)', n:'후식'},
-    {t:'떡 · 약과 · 간식', n:'다과'},
-    {t:'인스턴트 라면', n:'마무리 야식'},
+    {t:'삼겹살 · 목살'},{t:'소고기 (채끝·꽃등심)'},{t:'닭날개 (양념구이)'},
+    {t:'소시지 · 옥수수'},{t:'쌈채소 (상추·깻잎·쑥갓)'},{t:'쌈장 · 파절이 · 김치'},
+    {t:'버섯 · 두부'},{t:'된장찌개 재료'},{t:'과일 (수박·참외)'},{t:'떡 · 약과 · 간식'},{t:'인스턴트 라면'},
   ]},
   { cat:'🍻 음료', color:'#2D6A9B', items:[
-    {t:'맥주 (캔)', n:'충분히'},
-    {t:'막걸리', n:''},
-    {t:'소주', n:''},
-    {t:'생수 · 탄산수', n:''},
-    {t:'커피 · 차 (티백)', n:''},
+    {t:'생수 · 탄산수'},{t:'커피 · 차 (티백)'},
   ]},
   { cat:'👤 개인 지참물', color:'#5C5C5C', items:[
-    {t:'편한 야외 복장 · 겉옷', n:'저녁 기온 대비'},
-    {t:'신분증', n:'예약자 본인 필수'},
-    {t:'선크림 · 선글라스', n:''},
-    {t:'모기 기피제', n:''},
-    {t:'개인 상비약', n:'소화제·진통제'},
-    {t:'보조배터리', n:''},
-    {t:'카메라 / 스마트폰', n:''},
+    {t:'편한 야외 복장 · 겉옷'},{t:'신분증'},{t:'선크림 · 선글라스'},
+    {t:'모기 기피제'},{t:'개인 상비약'},{t:'보조배터리'},{t:'카메라 / 스마트폰'},
   ]},
   { cat:'🎮 여가 용품', color:'#6B3A9E', items:[
-    {t:'윷놀이 세트', n:''},
-    {t:'보드게임 / 화투 / 카드', n:''},
-    {t:'블루투스 스피커', n:''},
-    {t:'셀카봉 · 삼각대', n:'단체 사진'},
+    {t:'윷놀이 세트'},{t:'보드게임 / 화투 / 카드'},{t:'블루투스 스피커'},{t:'셀카봉 · 삼각대'},
   ]},
 ];
 
-// Render checklist
-const state = {};
-let totalItems = 0;
+const STORAGE_KEY = 'maymay-checklist-2026';
 
-function updateProgress(){
-  const done = Object.values(state).filter(Boolean).length;
-  const pct = totalItems ? Math.round(done/totalItems*100) : 0;
-  document.getElementById('progressBar').style.width = pct+'%';
+function genId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 }
 
-function buildChecklist(){
+function loadData() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) return JSON.parse(saved);
+  } catch(e) {}
+  return defaultCats.map(cat => ({
+    cat: cat.cat, color: cat.color,
+    items: cat.items.map(item => ({ id: genId(), t: item.t, assignee: '', done: false }))
+  }));
+}
+
+function saveData() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(checkData)); } catch(e) {}
+  showToast('저장됨 ✓');
+}
+
+let checkData = loadData();
+
+function updateProgress() {
+  let total = 0, done = 0;
+  checkData.forEach(cat => cat.items.forEach(item => { total++; if (item.done) done++; }));
+  const pct = total ? Math.round(done / total * 100) : 0;
+  document.getElementById('progressBar').style.width = pct + '%';
+}
+
+function updateCatCount(ci) {
+  const sec = document.getElementById('checklistContainer').children[ci];
+  if (sec) sec.querySelector('.check-cat-count').textContent = checkData[ci].items.length + '개';
+}
+
+function makeRow(ci, ii) {
+  const item = checkData[ci].items[ii];
+  const row = document.createElement('div');
+  row.className = 'check-row';
+
+  const box = document.createElement('div');
+  box.className = 'check-box' + (item.done ? ' done' : '');
+  box.onclick = () => {
+    item.done = !item.done;
+    box.classList.toggle('done', item.done);
+    inp.classList.toggle('done', item.done);
+    updateProgress();
+    saveData();
+  };
+
+  const inp = document.createElement('input');
+  inp.type = 'text';
+  inp.className = 'check-item-input' + (item.done ? ' done' : '');
+  inp.value = item.t;
+  inp.onchange = () => { item.t = inp.value; saveData(); };
+
+  const asgn = document.createElement('input');
+  asgn.type = 'text';
+  asgn.className = 'check-assignee';
+  asgn.placeholder = '담당자';
+  asgn.value = item.assignee || '';
+  asgn.onchange = () => { item.assignee = asgn.value; saveData(); };
+
+  const del = document.createElement('button');
+  del.className = 'check-delete';
+  del.textContent = '✕';
+  del.onclick = () => { checkData[ci].items.splice(ii, 1); buildChecklist(); updateProgress(); saveData(); };
+
+  row.appendChild(box);
+  row.appendChild(inp);
+  row.appendChild(asgn);
+  row.appendChild(del);
+  return row;
+}
+
+function buildChecklist() {
   const wrap = document.getElementById('checklistContainer');
+  wrap.innerHTML = '';
   checkData.forEach((cat, ci) => {
     const sec = document.createElement('div');
     sec.className = 'check-section';
@@ -773,45 +821,31 @@ function buildChecklist(){
 
     const list = document.createElement('div');
     list.className = 'check-items';
-
-    cat.items.forEach((item, ii) => {
-      const key = `${ci}-${ii}`;
-      state[key] = false;
-      totalItems++;
-
-      const row = document.createElement('div');
-      row.className = 'check-row';
-
-      const box = document.createElement('div');
-      box.className = 'check-box';
-      box.onclick = () => {
-        state[key] = !state[key];
-        box.classList.toggle('done', state[key]);
-        txt.classList.toggle('done', state[key]);
-        updateProgress();
-      };
-
-      const txt = document.createElement('div');
-      txt.className = 'check-item-text';
-      txt.textContent = item.t;
-
-      row.appendChild(box);
-      row.appendChild(txt);
-      if(item.n){
-        const note = document.createElement('div');
-        note.className = 'check-note';
-        note.textContent = item.n;
-        row.appendChild(note);
-      }
-      list.appendChild(row);
-    });
-
+    cat.items.forEach((_, ii) => list.appendChild(makeRow(ci, ii)));
     sec.appendChild(list);
+
+    const addBtn = document.createElement('button');
+    addBtn.className = 'check-add-btn';
+    addBtn.textContent = '+ 항목 추가';
+    addBtn.onclick = () => {
+      checkData[ci].items.push({ id: genId(), t: '', assignee: '', done: false });
+      const ii = checkData[ci].items.length - 1;
+      const row = makeRow(ci, ii);
+      list.appendChild(row);
+      row.querySelector('.check-item-input').focus();
+      updateCatCount(ci);
+      updateProgress();
+      saveData();
+    };
+    sec.appendChild(addBtn);
+
     wrap.appendChild(sec);
   });
 }
 
 buildChecklist();
+updateProgress();
 </script>
+<div id="toast" class="toast"></div>
 </body>
 </html>
