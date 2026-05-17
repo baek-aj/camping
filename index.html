@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>메이메이 소풍 일정 🌅</title>
 <link href="https://fonts.googleapis.com/css2?family=Nanum+Myeongjo:wght@400;700;800&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
 <style>
   :root {
     --sky: #1a3a5c;
@@ -745,7 +747,20 @@
 </div>
 
 <script>
-// Share checklist via URL hash
+// ── FIREBASE CONFIG ── Firebase 콘솔에서 복사한 값으로 교체하세요
+const firebaseConfig = {
+  apiKey: "AIzaSyCszbfMt-dUM9zCDpivTXm0jKxIqGX9Jvg",
+  authDomain: "camping-2026-af510.firebaseapp.com",
+  databaseURL: "https://camping-2026-af510-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "camping-2026-af510",
+  storageBucket: "camping-2026-af510.firebasestorage.app",
+  messagingSenderId: "949232417667",
+  appId: "1:949232417667:web:8fe4b6aefcb54d46e314b6",
+};
+firebase.initializeApp(firebaseConfig);
+const checklistRef = firebase.database().ref('checklist');
+
+// Share via URL hash
 function encodeState(data) {
   return btoa(encodeURIComponent(JSON.stringify(data)));
 }
@@ -808,39 +823,21 @@ const defaultCats = [
   ]},
 ];
 
-const STORAGE_KEY = 'maymay-checklist-2026';
-
 function genId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 }
 
-function loadData() {
-  // 1) URL 해시에 공유 상태가 있으면 우선 사용
-  try {
-    const hash = location.hash;
-    if (hash.startsWith('#state=')) {
-      const decoded = decodeState(hash.slice(7));
-      if (decoded && decoded.length) return decoded;
-    }
-  } catch(e) {}
-  // 2) 로컬 저장 데이터
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) return JSON.parse(saved);
-  } catch(e) {}
-  // 3) 기본값
-  return defaultCats.map(cat => ({
-    cat: cat.cat, color: cat.color,
-    items: cat.items.map(item => ({ id: genId(), t: item.t, assignee: '', done: false }))
-  }));
-}
-
+// Firebase 저장 (500ms 디바운스 — 빠른 연속 입력 시 불필요한 쓰기 방지)
 function saveData() {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(checkData)); } catch(e) {}
-  showToast('저장됨 ✓');
+  clearTimeout(saveData._t);
+  saveData._t = setTimeout(() => {
+    checklistRef.set(checkData)
+      .then(() => showToast('저장됨 ✓'))
+      .catch(() => showToast('저장 실패 ⚠️'));
+  }, 500);
 }
 
-let checkData = loadData();
+let checkData = [];
 
 function updateProgress() {
   let total = 0, done = 0;
@@ -931,8 +928,49 @@ function buildChecklist() {
   });
 }
 
-buildChecklist();
-updateProgress();
+function initChecklist() {
+  // URL 해시 공유 링크 우선 처리
+  const hash = location.hash;
+  if (hash.startsWith('#state=')) {
+    try {
+      const decoded = decodeState(hash.slice(7));
+      if (decoded && decoded.length) {
+        checkData = decoded;
+        buildChecklist();
+        updateProgress();
+        return;
+      }
+    } catch(e) {}
+  }
+
+  // Firebase 응답을 기다리지 않고 기본값으로 즉시 렌더링
+  checkData = defaultCats.map(cat => ({
+    cat: cat.cat, color: cat.color,
+    items: cat.items.map(item => ({ id: genId(), t: item.t, assignee: '', done: false }))
+  }));
+  buildChecklist();
+  updateProgress();
+
+  // Firebase 실시간 구독 — 저장된 데이터가 있으면 덮어씀
+  checklistRef.on('value', (snapshot) => {
+    const incoming = snapshot.val();
+
+    if (!incoming || !Array.isArray(incoming) || incoming.length === 0) {
+      // DB가 비어있으면 현재 기본값을 Firebase에 저장
+      checklistRef.set(checkData);
+      return;
+    }
+
+    // 내 저장과 다른 내용일 때만 화면 갱신
+    if (JSON.stringify(incoming) !== JSON.stringify(checkData)) {
+      checkData = incoming;
+      buildChecklist();
+      updateProgress();
+    }
+  });
+}
+
+initChecklist();
 </script>
 <div id="toast" class="toast"></div>
 </body>
