@@ -833,7 +833,7 @@ function saveData() {
   saveData._t = setTimeout(() => {
     checklistRef.set(checkData)
       .then(() => showToast('저장됨 ✓'))
-      .catch(() => showToast('저장 실패 ⚠️'));
+      .catch((err) => { console.error('Firebase 저장 실패:', err); showToast('저장 실패 ⚠️'); });
   }, 500);
 }
 
