@@ -153,16 +153,37 @@
     margin:16px 16px 0;
     background:linear-gradient(120deg,#0a4520,#1a8c4a);
     border-radius:16px; padding:14px 16px;
-    display:flex; align-items:center; gap:12px;
+    display:flex; flex-direction:column; gap:10px;
   }
+  .cb-top { display:flex; align-items:center; gap:12px; }
   .cb-icon { font-size:24px; }
   .cb-body { flex:1; }
   .cb-title { font-size:14px; font-weight:700; color:#fff; }
   .cb-desc { font-size:11.5px; color:rgba(255,255,255,0.8); margin-top:2px; line-height:1.5; }
+  .cb-sites {
+    display:flex; gap:8px; margin-top:6px;
+  }
+  .cb-site-badge {
+    background:rgba(255,255,255,0.22); border:1.5px solid rgba(255,255,255,0.5);
+    border-radius:8px; padding:3px 12px;
+    font-size:13px; font-weight:700; color:#fff; letter-spacing:0.5px;
+  }
   .cb-chip {
     background:rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.4);
     border-radius:10px; padding:3px 10px;
     font-size:11px; font-weight:700; color:#fff; white-space:nowrap;
+  }
+  .cb-map {
+    border-radius:10px; overflow:hidden;
+    border:2px solid rgba(255,255,255,0.3);
+  }
+  .cb-map img {
+    width:100%; display:block;
+    max-height:220px; object-fit:cover; object-position:center;
+  }
+  .cb-map-caption {
+    background:rgba(0,0,0,0.35); padding:5px 10px;
+    font-size:11px; color:rgba(255,255,255,0.85); text-align:center;
   }
 
   /* ── FROG BOX ── */
@@ -446,9 +467,9 @@
     <div class="mt mt2"></div>
     <div class="mt mt3"></div>
   </div>
-  <div class="hero-tag">MAYMAY OUTING 2026</div>
-  <div class="hero-title">메이메이<br>소풍 일정</div>
-  <div class="hero-sub">서울 상암동 월드컵공원 · 노을공원</div>
+  <div class="hero-tag">美美 - měi měi OUTING 2026</div>
+  <div class="hero-title">메이메이<br>소풍</div>
+  <div class="hero-sub">Venue - 서울 상암동 월드컵공원 · 노을공원</div>
 </div>
 
 <!-- BADGES -->
@@ -462,12 +483,22 @@
 
 <!-- CONFIRMED BANNER -->
 <div class="confirmed-banner fade-in">
-  <div class="cb-icon">✅</div>
-  <div class="cb-body">
-    <div class="cb-title">A구역 예약 확정</div>
-    <div class="cb-desc">전기 O · 테이블 O · 화덕 O · 13,000원/사이트</div>
+  <div class="cb-top">
+    <div class="cb-icon">✅</div>
+    <div class="cb-body">
+      <div class="cb-title">A구역 예약 확정</div>
+      <div class="cb-desc">전기 O · 테이블 O · 화덕 O · 13,000원/사이트</div>
+      <div class="cb-sites">
+        <span class="cb-site-badge">A40</span>
+        <span class="cb-site-badge">A50</span>
+      </div>
+    </div>
+    <div class="cb-chip">CONFIRMED</div>
   </div>
-  <div class="cb-chip">CONFIRMED</div>
+  <div class="cb-map">
+    <img src="https://www.seoul.go.kr/res_newseoul_story/campingjang/images/2025_noel_map.png" alt="노을캠핑장 A구역 지도" onerror="this.closest('.cb-map').style.display='none'">
+    <div class="cb-map-caption">노을캠핑장 A구역 배치도</div>
+  </div>
 </div>
 
 <!-- FROG BOX -->
