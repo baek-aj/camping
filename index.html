@@ -294,8 +294,16 @@
   /* ── CHECKLIST EDITABLE ── */
   .check-item-input {
     flex:1; font-size:13px; color:var(--text-dark);
-    border:none; background:transparent; outline:none;
+    border:none; border-bottom:1.5px solid transparent;
+    background:transparent; outline:none;
     min-width:0; font-family:'Noto Sans KR',sans-serif;
+    cursor:text; transition:border-color .15s, background .15s;
+    border-radius:0; padding-bottom:1px;
+  }
+  .check-item-input:hover { border-bottom-color:#ddd; }
+  .check-item-input:focus {
+    border-bottom-color:var(--sky);
+    background:rgba(33,150,243,0.04);
   }
   .check-item-input.done { color:var(--text-soft); text-decoration:line-through; }
   .check-assignee {
@@ -841,14 +849,14 @@ function makeRow(ci, ii) {
   inp.type = 'text';
   inp.className = 'check-item-input' + (item.done ? ' done' : '');
   inp.value = item.t;
-  inp.onchange = () => { item.t = inp.value; saveData(); };
+  inp.onblur = () => { if (item.t !== inp.value) { item.t = inp.value; saveData(); } };
 
   const asgn = document.createElement('input');
   asgn.type = 'text';
   asgn.className = 'check-assignee';
   asgn.placeholder = '담당자';
   asgn.value = item.assignee || '';
-  asgn.onchange = () => { item.assignee = asgn.value; saveData(); };
+  asgn.onblur = () => { if (item.assignee !== asgn.value) { item.assignee = asgn.value; saveData(); } };
 
   const del = document.createElement('button');
   del.className = 'check-delete';
