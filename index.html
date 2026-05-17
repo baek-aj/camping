@@ -359,17 +359,6 @@
     font-size:10.5px; color:var(--text-soft); font-weight:400;
   }
 
-  /* ── SHARE BUTTON ── */
-  .share-btn {
-    width:100%; padding:11px;
-    background:linear-gradient(135deg, var(--sky-mid), var(--sky));
-    border:none; border-radius:12px; color:#fff;
-    font-size:13px; font-weight:600; cursor:pointer;
-    margin-bottom:14px; font-family:'Noto Sans KR',sans-serif;
-    transition:opacity .15s; letter-spacing:.3px;
-  }
-  .share-btn:active { opacity:.8; }
-
   /* ── ROLES ── */
   .role-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
   .role-card {
@@ -690,7 +679,6 @@
 <div id="tab-checklist" class="tab-pane">
   <div class="section">
     <div class="sec-title">준비물 체크리스트</div>
-    <button class="share-btn" onclick="shareChecklist()">📤 공유 링크 생성</button>
     <div class="check-progress"><div class="check-progress-bar" id="progressBar" style="width:0%"></div></div>
     <div id="checklistContainer"></div>
     <div class="spacer"></div>
@@ -759,23 +747,6 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const checklistRef = firebase.database().ref('checklist');
-
-// Share via URL hash
-function encodeState(data) {
-  return btoa(encodeURIComponent(JSON.stringify(data)));
-}
-function decodeState(str) {
-  return JSON.parse(decodeURIComponent(atob(str)));
-}
-function shareChecklist() {
-  const encoded = encodeState(checkData);
-  const url = location.href.split('#')[0] + '#state=' + encoded;
-  if (navigator.clipboard) {
-    navigator.clipboard.writeText(url).then(() => showToast('공유 링크가 복사됐어요 📋'));
-  } else {
-    prompt('아래 링크를 복사해주세요:', url);
-  }
-}
 
 // Tab switching
 function switchTab(id, btn) {
@@ -929,20 +900,6 @@ function buildChecklist() {
 }
 
 function initChecklist() {
-  // URL 해시 공유 링크 우선 처리
-  const hash = location.hash;
-  if (hash.startsWith('#state=')) {
-    try {
-      const decoded = decodeState(hash.slice(7));
-      if (decoded && decoded.length) {
-        checkData = decoded;
-        buildChecklist();
-        updateProgress();
-        return;
-      }
-    } catch(e) {}
-  }
-
   // Firebase 응답을 기다리지 않고 기본값으로 즉시 렌더링
   checkData = defaultCats.map(cat => ({
     cat: cat.cat, color: cat.color,
