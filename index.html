@@ -121,24 +121,13 @@
     font-size:12.5px; color:rgba(255,255,255,0.75);
     margin-top:6px; position:relative; z-index:2; text-align:center;
   }
+  .hero-date {
+    font-size:13px; color:rgba(255,255,255,0.9); font-weight:500;
+    margin-top:5px; position:relative; z-index:2; text-align:center;
+    letter-spacing:0.3px;
+  }
 
   /* ── BADGE ROW ── */
-  .badge-row {
-    display:flex; gap:8px; padding:16px 16px 0;
-    overflow-x:auto; scrollbar-width:none;
-  }
-  .badge-row::-webkit-scrollbar { display:none; }
-  .badge {
-    flex-shrink:0;
-    background:#fff; border:1.5px solid rgba(45,106,155,0.18);
-    border-radius:20px; padding:6px 14px;
-    font-size:12px; font-weight:500; color:var(--sky);
-    white-space:nowrap; box-shadow:0 2px 8px rgba(26,58,92,0.07);
-  }
-  .badge.confirmed {
-    background:linear-gradient(135deg,#0d5c2e,#1a8c4a);
-    color:#fff; border-color:transparent;
-  }
 
   /* ── SECTION ── */
   .section { padding:20px 16px 0; }
@@ -176,14 +165,64 @@
   .cb-map {
     border-radius:10px; overflow:hidden;
     border:2px solid rgba(255,255,255,0.3);
+    cursor:zoom-in;
   }
+  .cb-map-inner { position:relative; }
   .cb-map img {
     width:100%; display:block;
     max-height:220px; object-fit:cover; object-position:center;
   }
+  .cb-map-svg {
+    position:absolute; inset:0; width:100%; height:100%; pointer-events:none;
+  }
   .cb-map-caption {
     background:rgba(0,0,0,0.35); padding:5px 10px;
     font-size:11px; color:rgba(255,255,255,0.85); text-align:center;
+  }
+  .cb-direction {
+    margin-top:10px; display:flex; flex-direction:column; gap:5px;
+  }
+  .cb-dir-row {
+    font-size:11.5px; color:rgba(255,255,255,0.82); line-height:1.5;
+  }
+
+  /* ── LIGHTBOX ── */
+  .lightbox {
+    display:none; position:fixed; inset:0; z-index:9999;
+    background:rgba(0,0,0,0.88);
+    align-items:center; justify-content:center;
+    overflow:hidden;
+  }
+  .lightbox.open { display:flex; }
+  #lightbox-content {
+    position:relative; display:inline-flex;
+    transform-origin:center center;
+    touch-action:none; will-change:transform;
+  }
+  #lightbox-content img {
+    max-width:94vw; max-height:88vh;
+    border-radius:10px; object-fit:contain;
+    box-shadow:0 8px 40px rgba(0,0,0,0.6);
+    user-select:none; -webkit-user-select:none;
+    display:block;
+  }
+  .lb-marker {
+    position:absolute; transform:translate(-50%,-50%);
+    background:rgba(220,40,40,0.90); border:2.5px solid #fff;
+    border-radius:50%; width:38px; height:38px;
+    display:flex; align-items:center; justify-content:center;
+    color:#fff; font-weight:700; font-size:12px;
+    pointer-events:none; white-space:nowrap;
+  }
+  .lightbox-close {
+    position:absolute; top:16px; right:18px;
+    font-size:32px; color:#fff; cursor:pointer;
+    line-height:1; opacity:0.8; z-index:1;
+  }
+  .lightbox-close:hover { opacity:1; }
+  .lightbox-hint {
+    position:absolute; bottom:20px; left:50%; transform:translateX(-50%);
+    font-size:11px; color:rgba(255,255,255,0.5); white-space:nowrap; pointer-events:none;
   }
 
   /* ── FROG BOX ── */
@@ -469,17 +508,10 @@
   </div>
   <div class="hero-tag">美美 - měi měi OUTING 2026</div>
   <div class="hero-title">메이메이<br>소풍</div>
-  <div class="hero-sub">Venue - 서울 상암동 월드컵공원 · 노을공원</div>
+  <div class="hero-sub">서울 상암동 월드컵공원 · 노을공원</div>
+  <div class="hero-date">2026년 6월 3일 &nbsp;14:00 – 20:00</div>
 </div>
 
-<!-- BADGES -->
-<div class="badge-row">
-  <div class="badge">📅 6월 3일</div>
-  <div class="badge">🕑 오후 2시 – 8시</div>
-  <div class="badge">🔥 BBQ 저녁</div>
-  <div class="badge">👫 8명</div>
-  <div class="badge confirmed">✅ A구역 예약완료</div>
-</div>
 
 <!-- CONFIRMED BANNER -->
 <div class="confirmed-banner fade-in">
@@ -495,10 +527,31 @@
     </div>
     <div class="cb-chip">CONFIRMED</div>
   </div>
-  <div class="cb-map">
-    <img src="https://www.seoul.go.kr/res_newseoul_story/campingjang/images/2025_noel_map.png" alt="노을캠핑장 A구역 지도" onerror="this.closest('.cb-map').style.display='none'">
-    <div class="cb-map-caption">노을캠핑장 A구역 배치도</div>
+  <div class="cb-map" onclick="openLightbox('https://www.seoul.go.kr/res_newseoul_story/campingjang/images/2025_noel_map.png')">
+    <div class="cb-map-inner">
+      <img src="https://www.seoul.go.kr/res_newseoul_story/campingjang/images/2025_noel_map.png" alt="노을캠핑장 A구역 지도" onerror="this.closest('.cb-map').style.display='none'">
+      <svg class="cb-map-svg" viewBox="0 0 748 546" preserveAspectRatio="xMidYMid slice">
+        <circle cx="155" cy="375" r="16" fill="rgba(220,40,40,0.88)" stroke="white" stroke-width="2.5"/>
+        <text x="155" y="375" text-anchor="middle" dominant-baseline="middle" font-size="13" font-weight="bold" fill="white">A40</text>
+        <circle cx="195" cy="400" r="16" fill="rgba(220,40,40,0.88)" stroke="white" stroke-width="2.5"/>
+        <text x="195" y="400" text-anchor="middle" dominant-baseline="middle" font-size="13" font-weight="bold" fill="white">A50</text>
+      </svg>
+    </div>
+    <div class="cb-map-caption">노을캠핑장 A구역 배치도 · 탭하여 확대</div>
   </div>
+  <div class="cb-direction">
+    <div class="cb-dir-row">🐸 맹꽁이 전기차 하차 후 정면 안내도 확인 → 왼쪽 방향으로 이동하면 A구역 입구</div>
+    <div class="cb-dir-row">🏕️ 매점·화장실이 A구역 바로 옆 — 짐 내리기 전 사이트 위치 먼저 확인</div>
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox">
+  <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
+  <div id="lightbox-content">
+    <img id="lightbox-img" src="" alt="">
+  </div>
+  <div class="lightbox-hint">핀치로 확대 · 더블탭으로 2배 확대</div>
 </div>
 
 <!-- FROG BOX -->
@@ -967,6 +1020,109 @@ function initChecklist() {
 }
 
 initChecklist();
+
+// ── LIGHTBOX + PINCH ZOOM ──
+(function() {
+  const lb = document.getElementById('lightbox');
+  const content = document.getElementById('lightbox-content');
+  const img = document.getElementById('lightbox-img');
+  let scale = 1, pinchStartScale = 1, pinchStartDist = 0;
+  let tx = 0, ty = 0, panStartX = 0, panStartY = 0, panStartTx = 0, panStartTy = 0;
+  let isPinching = false, isPanning = false, lastTapTime = 0;
+
+  function applyT() {
+    content.style.transform = `translate(${tx}px,${ty}px) scale(${scale})`;
+  }
+  function resetT() {
+    scale = 1; tx = 0; ty = 0; content.style.transform = '';
+  }
+
+  const MAP_W = 748, MAP_H = 546;
+  const MAP_MARKERS = [
+    { x: 155, y: 375, label: 'A40' },
+    { x: 195, y: 400, label: 'A50' },
+  ];
+
+  function addLbMarkers() {
+    content.querySelectorAll('.lb-marker').forEach(m => m.remove());
+    const iw = img.offsetWidth, ih = img.offsetHeight;
+    MAP_MARKERS.forEach(({ x, y, label }) => {
+      const el = document.createElement('div');
+      el.className = 'lb-marker';
+      el.textContent = label;
+      el.style.left = (x / MAP_W * iw) + 'px';
+      el.style.top  = (y / MAP_H * ih) + 'px';
+      content.appendChild(el);
+    });
+  }
+
+  window.openLightbox = function(src) {
+    resetT();
+    img.src = src;
+    lb.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    const place = () => requestAnimationFrame(addLbMarkers);
+    if (img.complete && img.naturalWidth) { place(); }
+    else { img.onload = place; }
+  };
+  window.closeLightbox = function() {
+    lb.classList.remove('open');
+    document.body.style.overflow = '';
+    resetT();
+  };
+
+  lb.addEventListener('click', function(e) {
+    if (e.target === lb) closeLightbox();
+  });
+
+  lb.addEventListener('touchstart', function(e) {
+    if (e.touches.length === 2) {
+      isPinching = true; isPanning = false;
+      e.preventDefault();
+      pinchStartDist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      pinchStartScale = scale;
+    } else if (e.touches.length === 1) {
+      if (scale > 1) {
+        isPanning = true;
+        panStartX = e.touches[0].clientX; panStartY = e.touches[0].clientY;
+        panStartTx = tx; panStartTy = ty;
+      }
+      const now = Date.now();
+      if (now - lastTapTime < 280) {
+        e.preventDefault();
+        if (scale > 1.5) { resetT(); } else { scale = 2.5; tx = 0; ty = 0; applyT(); }
+        lastTapTime = 0;
+      } else { lastTapTime = now; }
+    }
+  }, { passive: false });
+
+  lb.addEventListener('touchmove', function(e) {
+    if (isPinching && e.touches.length === 2) {
+      e.preventDefault();
+      const dist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      scale = Math.min(6, Math.max(1, pinchStartScale * dist / pinchStartDist));
+      applyT();
+    } else if (isPanning && e.touches.length === 1) {
+      e.preventDefault();
+      tx = panStartTx + (e.touches[0].clientX - panStartX);
+      ty = panStartTy + (e.touches[0].clientY - panStartY);
+      applyT();
+    }
+  }, { passive: false });
+
+  lb.addEventListener('touchend', function(e) {
+    if (e.touches.length < 2) isPinching = false;
+    if (e.touches.length === 0) { isPanning = false; if (scale < 1.05) resetT(); }
+  });
+
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+})();
 </script>
 <div id="toast" class="toast"></div>
 </body>
