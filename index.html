@@ -393,6 +393,107 @@
     transition:border-color .15s, color .15s;
   }
   .check-add-btn:active { border-color:var(--sky); color:var(--sky); }
+
+  /* ── COST INPUT ── */
+  .check-cost {
+    width:48px; font-size:11px; color:#c45a1a;
+    border:none; border-bottom:1px dashed #ccc;
+    background:transparent; outline:none;
+    text-align:right; padding:2px 2px; flex-shrink:0;
+    font-family:'Noto Sans KR',sans-serif;
+  }
+  .check-cost:focus { border-bottom-color:var(--sunset); }
+  .check-cost::placeholder { color:#ddd; }
+  .check-cost::-webkit-outer-spin-button,
+  .check-cost::-webkit-inner-spin-button { -webkit-appearance:none; }
+  .check-cost[type=number] { -moz-appearance:textfield; }
+
+  /* ── ASSIGNEE SUMMARY ── */
+  .assignee-summary {
+    margin-top:14px; background:var(--warm-white);
+    border:1.5px solid rgba(26,58,92,0.1);
+    border-radius:14px; padding:14px; display:none;
+  }
+  .asgn-sum-title {
+    font-size:11px; font-weight:700; color:var(--text-soft);
+    letter-spacing:0.8px; text-transform:uppercase; margin-bottom:10px;
+  }
+  .asgn-sum-row {
+    display:flex; align-items:flex-start; gap:8px;
+    padding:7px 0; border-bottom:1px solid #f0f0f0;
+  }
+  .asgn-sum-row:last-child { border-bottom:none; }
+  .asgn-sum-name {
+    font-size:12.5px; font-weight:700; color:var(--sky);
+    min-width:60px; flex-shrink:0; padding-top:2px;
+  }
+  .asgn-sum-items { flex:1; font-size:11.5px; color:var(--text-mid); line-height:1.7; }
+  .asgn-sum-cost {
+    font-size:12px; font-weight:700; color:#c45a1a;
+    white-space:nowrap; padding-top:2px;
+  }
+
+  /* ── SETTLEMENT BUTTON ── */
+  .settlement-btn {
+    width:100%; padding:14px;
+    background:linear-gradient(135deg,#1a3a5c,#2d6a9b);
+    border:none; border-radius:14px;
+    color:#fff; font-size:15px; font-weight:700;
+    cursor:pointer; margin-top:16px;
+    font-family:'Noto Sans KR',sans-serif;
+    box-shadow:0 4px 16px rgba(26,58,92,0.2);
+    letter-spacing:0.3px;
+  }
+  .settlement-btn:active { opacity:0.9; transform:scale(0.99); }
+
+  /* ── SETTLEMENT MODAL ── */
+  .settlement-modal {
+    display:none; position:fixed; inset:0; z-index:9998;
+    background:rgba(0,0,0,0.55);
+    align-items:flex-end; justify-content:center;
+  }
+  .settlement-modal.open { display:flex; }
+  .settlement-sheet {
+    background:#fff; width:100%; max-height:85vh;
+    border-radius:22px 22px 0 0;
+    overflow-y:auto; padding:20px 18px 44px;
+  }
+  .stl-header {
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:18px;
+  }
+  .stl-title { font-size:17px; font-weight:800; color:var(--text-dark); }
+  .stl-close { font-size:26px; cursor:pointer; color:#bbb; line-height:1; }
+  .stl-person {
+    background:#f8f9fa; border-radius:14px;
+    padding:14px 14px 10px; margin-bottom:10px;
+  }
+  .stl-person-name {
+    font-size:14px; font-weight:700; color:var(--sky); margin-bottom:8px;
+  }
+  .stl-item-row {
+    display:flex; justify-content:space-between; align-items:center;
+    font-size:12.5px; color:var(--text-mid); padding:5px 0;
+    border-bottom:1px solid #eee;
+  }
+  .stl-item-row:last-of-type { border-bottom:none; }
+  .stl-item-name { flex:1; }
+  .stl-item-cost { font-size:12.5px; color:var(--text-dark); font-weight:500; white-space:nowrap; }
+  .stl-subtotal {
+    display:flex; justify-content:space-between; align-items:center;
+    font-size:13px; font-weight:700; color:var(--text-dark);
+    margin-top:10px; padding-top:8px; border-top:1.5px solid #ddd;
+  }
+  .stl-grand {
+    background:linear-gradient(135deg,#0a4520,#1a8c4a);
+    border-radius:14px; padding:18px 16px;
+    display:flex; justify-content:space-between; align-items:center;
+    margin-top:18px;
+  }
+  .stl-grand-label { font-size:15px; font-weight:700; color:#fff; }
+  .stl-grand-amount { font-size:22px; font-weight:800; color:#fff; }
+  .stl-empty { text-align:center; color:var(--text-soft); font-size:13px; padding:24px 0; }
+
   .toast {
     position:fixed; bottom:28px; left:50%;
     transform:translateX(-50%) translateY(12px);
@@ -773,7 +874,20 @@
     <div class="sec-title">준비물 체크리스트</div>
     <div class="check-progress"><div class="check-progress-bar" id="progressBar" style="width:0%"></div></div>
     <div id="checklistContainer"></div>
+    <div id="assigneeSummary" class="assignee-summary"></div>
+    <button class="settlement-btn" onclick="showSettlement()">💰 정산</button>
     <div class="spacer"></div>
+  </div>
+</div>
+
+<!-- SETTLEMENT MODAL -->
+<div class="settlement-modal" id="settlementModal" onclick="closeSettlement()">
+  <div class="settlement-sheet" onclick="event.stopPropagation()">
+    <div class="stl-header">
+      <div class="stl-title">💰 정산 내역</div>
+      <span class="stl-close" onclick="closeSettlement()">✕</span>
+    </div>
+    <div id="settlementContent"></div>
   </div>
 </div>
 
@@ -935,12 +1049,22 @@ function makeRow(ci, ii) {
   inp.value = item.t;
   inp.onblur = () => { if (item.t !== inp.value) { item.t = inp.value; saveData(); } };
 
+  const cost = document.createElement('input');
+  cost.type = 'number';
+  cost.className = 'check-cost';
+  cost.min = '0';
+  cost.placeholder = '비용';
+  cost.value = item.cost > 0 ? item.cost : '';
+  cost.oninput = () => { item.cost = parseInt(cost.value) || 0; buildAssigneeSummary(); };
+  cost.onblur = () => saveData();
+
   const asgn = document.createElement('input');
   asgn.type = 'text';
   asgn.className = 'check-assignee';
   asgn.placeholder = '담당자';
   asgn.value = item.assignee || '';
-  asgn.onblur = () => { if (item.assignee !== asgn.value) { item.assignee = asgn.value; saveData(); } };
+  asgn.oninput = () => { item.assignee = asgn.value; buildAssigneeSummary(); };
+  asgn.onblur = () => saveData();
 
   const del = document.createElement('button');
   del.className = 'check-delete';
@@ -949,9 +1073,82 @@ function makeRow(ci, ii) {
 
   row.appendChild(box);
   row.appendChild(inp);
+  row.appendChild(cost);
   row.appendChild(asgn);
   row.appendChild(del);
   return row;
+}
+
+function buildAssigneeSummary() {
+  const el = document.getElementById('assigneeSummary');
+  if (!el) return;
+  const map = {};
+  checkData.forEach(cat => {
+    cat.items.forEach(item => {
+      const names = (item.assignee || '').split(/[,，·\s\/]+/).map(s => s.trim()).filter(Boolean);
+      names.forEach(name => {
+        if (!map[name]) map[name] = { items: [], cost: 0 };
+        map[name].items.push(item.t || '(항목)');
+        map[name].cost += item.cost || 0;
+      });
+    });
+  });
+  const entries = Object.entries(map);
+  if (!entries.length) { el.style.display = 'none'; return; }
+  el.style.display = 'block';
+  el.innerHTML = '<div class="asgn-sum-title">담당자별 취합</div>' +
+    entries.map(([name, d]) =>
+      `<div class="asgn-sum-row">
+        <div class="asgn-sum-name">${name}</div>
+        <div class="asgn-sum-items">${d.items.join(' · ')}</div>
+        ${d.cost > 0 ? `<div class="asgn-sum-cost">₩${d.cost.toLocaleString()}</div>` : ''}
+      </div>`
+    ).join('');
+}
+
+function showSettlement() {
+  const map = {};
+  let grand = 0;
+  checkData.forEach(cat => {
+    cat.items.forEach(item => {
+      const c = item.cost || 0;
+      grand += c;
+      const names = (item.assignee || '').split(/[,，·\s\/]+/).map(s => s.trim()).filter(Boolean);
+      names.forEach(name => {
+        if (!map[name]) map[name] = [];
+        map[name].push({ t: item.t || '(항목)', cost: c });
+      });
+    });
+  });
+  const entries = Object.entries(map);
+  let html = '';
+  if (!entries.length && grand === 0) {
+    html = '<div class="stl-empty">담당자 또는 비용이 입력된 항목이 없습니다.</div>';
+  } else {
+    entries.forEach(([name, items]) => {
+      const sub = items.reduce((s, i) => s + i.cost, 0);
+      html += `<div class="stl-person">
+        <div class="stl-person-name">${name}</div>
+        ${items.map(i => `<div class="stl-item-row">
+          <span class="stl-item-name">${i.t}</span>
+          <span class="stl-item-cost">${i.cost > 0 ? '₩' + i.cost.toLocaleString() : '-'}</span>
+        </div>`).join('')}
+        <div class="stl-subtotal"><span>소계</span><span>₩${sub.toLocaleString()}</span></div>
+      </div>`;
+    });
+    html += `<div class="stl-grand">
+      <span class="stl-grand-label">전체 합계</span>
+      <span class="stl-grand-amount">₩${grand.toLocaleString()}</span>
+    </div>`;
+  }
+  document.getElementById('settlementContent').innerHTML = html;
+  document.getElementById('settlementModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeSettlement() {
+  document.getElementById('settlementModal').classList.remove('open');
+  document.body.style.overflow = '';
 }
 
 function buildChecklist() {
@@ -989,13 +1186,14 @@ function buildChecklist() {
 
     wrap.appendChild(sec);
   });
+  buildAssigneeSummary();
 }
 
 function initChecklist() {
   // Firebase 응답을 기다리지 않고 기본값으로 즉시 렌더링
   checkData = defaultCats.map(cat => ({
     cat: cat.cat, color: cat.color,
-    items: cat.items.map(item => ({ id: genId(), t: item.t, assignee: '', done: false }))
+    items: cat.items.map(item => ({ id: genId(), t: item.t, assignee: '', cost: 0, done: false }))
   }));
   buildChecklist();
   updateProgress();
